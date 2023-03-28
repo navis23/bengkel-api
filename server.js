@@ -27,6 +27,12 @@ const upKtgr = multer({storage: storageKategori}).single('foto')
 const corsOptions = {
     origin : "*"
 };
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+    // res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With,  Authorization, Content-Type, Accept");
+    next();
+});
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({extended : true}));
@@ -36,14 +42,21 @@ app.use('/app', express.static('app'));
 
 
 //db connect
-db.mongoose.connect(db.url, {
-    useNewUrlParser : true,
-    useUnifiedTopology : true
-}).then(() => console.log('connected to database')
-).catch(e => {
-    console.log(`failed to connect db : ${e.message}`);
-    process.exit()
-});
+
+const connectDatabase = async () => {
+    
+    await db.mongoose.connect(db.url, {
+        useNewUrlParser : true,
+        useUnifiedTopology : true
+    }).then(() => console.log('connected to database')
+    ).catch(e => {
+        console.log(`failed to connect db : ${e.message}`);
+        process.exit()
+    });
+};
+
+
+connectDatabase();
 
 // routes
 require("./app/routes/category.routes")(app);
